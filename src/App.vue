@@ -48,6 +48,49 @@ function sendConfig() {
   });
 }
 
+async function fetchConfig() {
+  if (!targetSerialNum.value) return;
+  const reqPayload = '{"type":"GET_FILE"}';
+
+  return new Promise<void>((resolve, reject) => {
+    const c = mqtt.connect(brokerUrl, { username, password });
+
+    const upTopic = `/XZRCU/UP/${targetSerialNum.value}`;
+    const downTopic = `/XZRCU/DOWN/${targetSerialNum.value}`;
+
+    const timer = setTimeout(() => {
+      c.end();
+      reject(new Error('MQTT timeout – no response'));
+    }, 5000);
+
+    c.on('connect', () => {
+      c.subscribe(upTopic, { qos: 1 }, () => {
+        c.publish(downTopic, reqPayload, { qos: 1 });
+      });
+    });
+
+    c.on('message', (_topic, payload) => {
+      if (_topic === upTopic) {
+        clearTimeout(timer);
+        try {
+          importAll(payload.toString(), commonConfigs, trueDeviceRows, actionGroupRows, inputRows);
+          resolve();
+        } catch (e) {
+          reject(e);
+        } finally {
+          c.end();
+        }
+      }
+    });
+
+    c.on('error', err => {
+      clearTimeout(timer);
+      c.end();
+      reject(err);
+    });
+  });
+}
+
 function handleFile(file: File) {
   return new Promise<void>((resolve, reject) => {
     const reader = new FileReader()
@@ -73,6 +116,7 @@ function handleFile(file: File) {
         <n-input :show-button="false" v-model:value="targetSerialNum" placeholder="目标序列号"></n-input>
         <n-button @click="sendConfig">直接发送配置</n-button>
         <n-button @click="downloadConfig">下载文件</n-button>
+        <n-button @click="fetchConfig">拉取配置</n-button>
         <input type="file" accept=".ndjson" @change="(e) => {
           const file = (e.target as HTMLInputElement).files?.[0]
           file && handleFile(file)
