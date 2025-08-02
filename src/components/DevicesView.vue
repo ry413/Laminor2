@@ -6,7 +6,7 @@ import { getDeviceId, type IDeviceRow } from '../types'
 import DeviceRow from './DeviceRow.vue'
 
 function addRow() {
-  trueDeviceRows.value.push({ did: getDeviceId(), type: 'lamp', carryState: null, payload: { name: '', channel: 127 } })
+  trueDeviceRows.value.push({ did: getDeviceId(), type: 'lamp', carryState: null, linkDids: [], repelDids: [], payload: { name: '', channel: 127 } })
 }
 
 </script>
@@ -15,10 +15,12 @@ function addRow() {
 export const trueDeviceRows = ref<IDeviceRow[]>([])
 
 const extraRows: IDeviceRow[] = [
-  { did: getDeviceId(), type: 'heartbeat', carryState: null, payload: { name: '更改心跳包' }},
-  { did: getDeviceId(), type: 'roomState', carryState: null, payload: { name: '房间状态操作' }},
-  { did: getDeviceId(), type: 'delayer', carryState: null, payload: { name: '延时' }},
-  { did: getDeviceId(), type: 'actionGroupOp', carryState: null, payload: { name: '模式' }},
+  { did: getDeviceId(), type: 'heartbeat', carryState: null, linkDids: [], repelDids: [], payload: { name: '更改心跳包' } },
+  { did: getDeviceId(), type: 'roomState', carryState: null, linkDids: [], repelDids: [], payload: { name: '房间状态操作' } },
+  { did: getDeviceId(), type: 'delayer', carryState: null, linkDids: [], repelDids: [], payload: { name: '延时' } },
+  { did: getDeviceId(), type: 'actionGroupOp', carryState: null, linkDids: [], repelDids: [], payload: { name: '模式' } },
+  { did: getDeviceId(), type: 'snapshot', carryState: null, linkDids: [], repelDids: [], payload: { name: '房间状态快照' } },
+  { did: getDeviceId(), type: 'indicator', carryState: null, linkDids: [], repelDids: [], payload: { name: '按键指示灯' } }
 ]
 
 export const operationTargets = computed(() => [
@@ -33,7 +35,8 @@ export const operationTargets = computed(() => [
     <template #item="{ element, index }">
       <div style="display: flex; align-items: center">
         <span class="drag-handle" style="cursor: grab; padding-right: 8px">☰</span>
-        <DeviceRow v-model:data="trueDeviceRows[index]" @remove="trueDeviceRows.splice(index, 1)" />
+        <DeviceRow :key="element.did" :trueDevices="trueDeviceRows" v-model:data="trueDeviceRows[index]"
+          @remove="trueDeviceRows.splice(index, 1)" />
       </div>
     </template>
   </draggable>

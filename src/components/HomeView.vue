@@ -3,56 +3,6 @@ import { type FormInst } from 'naive-ui';
 import { ref, type Ref } from 'vue'
 
 const formRef = ref<FormInst | null>(null)
-const rules = {
-  configName: {
-    required: true,
-    message: '配置名称',
-  },
-  airConfig: {
-    defaultTargetTemp: {
-      require: true,
-      message: '默认温度'
-    },
-    defaultMode: {
-      require: true,
-      message: '默认模式'
-    },
-    defaultFanSpeed: {
-      require: true,
-      message: '默认风速'
-    },
-    stopThreshold: {
-      require: true,
-      message: '停止工作所需超出目标温度的阈值'
-    },
-    reworkThreshold: {
-      require: true,
-      message: '回温后重新开始工作的阈值'
-    },
-    stopAction: {
-      require: true,
-      message: '盘管空调停止工作后的行为'
-    },
-    removeCardAirUsable: {
-      require: true,
-      message: '拔卡时空调是否可用'
-    },
-    autoFan: {
-      lowFanTempDiff: {
-        require: true,
-        message: '调到低风所需小于等于的温差'
-      },
-      highFanTempDiff: {
-        require: true,
-        message: '调到高风所需大于等于的温差'
-      },
-      autoVentFanSpeed: {
-        require: true,
-        message: '处于通风模式且自动风速时的风速'
-      }
-    }
-  }
-}
 </script>
 
 <script lang="ts">
@@ -65,6 +15,8 @@ export const commonConfigs: Ref = ref({
     stopThreshold: 1,
     reworkThreshold: 1,
     stopAction: 0,
+    shutdownAfterDuration: 30,
+    shutdownAfterFanSpeed: 0,
     removeCardAirUsable: false,
     autoFan: {
       lowFanTempDiff: 2,
@@ -77,7 +29,7 @@ export const commonConfigs: Ref = ref({
 
 <template>
   <div class="page-container">
-    <n-form ref="formRef" :rules="rules" class="form-wrapper" label-width="230px" label-placement="left">
+    <n-form ref="formRef" class="form-wrapper" label-width="230px" label-placement="left">
       <h2 style="text-align: center;">基础配置</h2>
       <n-form-item label="配置名称" path="configName">
         <n-input v-model:value="commonConfigs.configName" placeholder="输入" />
@@ -122,6 +74,21 @@ export const commonConfigs: Ref = ref({
           { label: '什么都不做', value: 3 },
         ]" />
       </n-form-item>
+      <n-form-item label="盘管空调关机后风机再吹">
+        <n-select v-model:value="commonConfigs.airConfig.shutdownAfterDuration" :options="[
+          { label: '0秒', value: 0 },
+          { label: '30秒', value: 30 },
+          { label: '45秒', value: 45 },
+          { label: '60秒', value: 60 },
+          { label: '90秒', value: 90 },
+          { label: '120秒', value: 120 },
+        ]" />
+        <n-select v-model:value="commonConfigs.airConfig.shutdownAfterFanSpeed" :options="[
+          { label: '低风', value: 0 },
+          { label: '中风', value: 1 },
+          { label: '高风', value: 2 },
+        ]" />
+      </n-form-item>
       <n-form-item label="拔卡时空调是否可用">
         <n-switch v-model:value="commonConfigs.airConfig.removeCardAirUsable" />
       </n-form-item>
@@ -155,16 +122,20 @@ export const commonConfigs: Ref = ref({
   left: 0;
   right: 0;
   bottom: 0;
-  overflow-y: auto;      /* Page‑level scrolling */
+  overflow-y: auto;
+  /* Page‑level scrolling */
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* keep content at the top */
-  padding: 24px 0;        /* optional top/bottom spacing */
+  align-items: flex-start;
+  /* keep content at the top */
+  padding: 24px 0;
+  /* optional top/bottom spacing */
   width: 100%;
 }
 
 .form-wrapper {
   width: 100%;
-  max-width: 600px;       /* keeps each form‑item narrow */
+  max-width: 600px;
+  /* keeps each form‑item narrow */
 }
 </style>

@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import draggable from 'vuedraggable'
 import { trueDeviceRows, operationTargets } from './DevicesView.vue'
-import { getInputId, InputType, type IInputRow } from '../types.ts'
+import { getInputId, InputType, TriggerType, type IInputRow } from '../types.ts'
 import InputRow from './InputRow.vue'
 import { actionGroupRows } from './ActionGroupView.vue'
 
@@ -13,12 +13,12 @@ function addInput() {
     iid: getInputId(),
     type: InputType.PANEL_BTN,
     actionRounds: [],
-    tags: [],
+    tags: null,
     lightBindDid: null,
     pid: 0,
     bid: 0,
     channel: 127,
-    triggerType: 1,
+    triggerType: TriggerType.HIGH_LEVEL,
     infraredDuration: 10,
   })
 }
@@ -31,10 +31,13 @@ export const inputRows = ref<IInputRow[]>([])
 <template>
   <draggable v-model="inputRows" item-key="id" handle=".drag-handle">
     <template #item="{ element, index }">
-      <div style="display:flex; align-items:center">
-        <span class="drag-handle" style="cursor:grab; padding-right:8px">☰</span>
-        <InputRow :key="element.iid" v-model:data="inputRows[index]" :trueDevices="trueDeviceRows"
+      <div>
+        <n-divider />
+        <div style="display:flex; align-items:center">
+          <span class="drag-handle" style="cursor:grab; padding-right:8px">☰</span>
+          <InputRow :key="element.iid" v-model:data="inputRows[index]" :trueDevices="trueDeviceRows"
           :operationTargets="operationTargets" :actionGroups="actionGroupRows" @remove="inputRows.splice(index, 1)" />
+        </div>
       </div>
     </template>
   </draggable>

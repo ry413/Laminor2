@@ -30,7 +30,7 @@ const model = computed({
 
 <template>
     <div class="input-row">
-
+        <p>{{ props.data.aid }}</p>
         <n-input v-model:value="model.name" placeholder="" style="width: 140px;">
             <template #prefix><n-text depth="3">名称:</n-text></template>
         </n-input>
@@ -67,16 +67,4 @@ const model = computed({
 </style>
 
 <script lang="ts">
-// 帮助函数：根据 id 找到设备类型
-
-// export function getDeviceType(id: number) {
-//   const dev = (getCurrentInstance()?.props as any).devices
-//     .find((d: IDeviceRow) => d.did === id)
-//   return dev?.type as DeviceType
-// // }
-// export function getDeviceType(id: number, devices: IDeviceRow[]) {
-//   const dev = devices.find(d => d.did === id)
-//   return dev?.type as DeviceType | undefined
-// }
-
 </script>

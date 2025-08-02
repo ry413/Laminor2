@@ -9,6 +9,7 @@ import {
   type IActionGroupRow,
   InputTag,
   type IActionRow,
+  TriggerType,
 } from '../types.ts'
 import ActionList from './ActionList.vue'
 
@@ -75,6 +76,7 @@ const currentActions = computed({
 <template>
   <!-- 输入行本体 -->
   <div class="input-row">
+    <p>{{ props.data.iid }}</p>
     <n-input v-model:value="model.name" placeholder="" style="width: 140px;">
       <template #prefix><n-text depth="3">名称:</n-text></template>
     </n-input>
@@ -100,13 +102,13 @@ const currentActions = computed({
           <template #prefix><n-text depth="3">通道:</n-text></template>
         </n-input-number>
         <n-select v-model:value="model.triggerType" :options="[
-          { label: '低电平', value: 0 },
-          { label: '高电平', value: 1 },
-          { label: '红外触发', value: 2 },
-          { label: '红外超时', value: 3 }
+          { label: '低电平', value: TriggerType.LOW_LEVEL },
+          { label: '高电平', value: TriggerType.HIGH_LEVEL },
+          { label: '红外触发', value: TriggerType.INFRARED },
+          { label: '红外超时', value: TriggerType.INFRARED_TIMEOUT }
         ]" style="width: 110px" :consistent-menu-width="false" />
 
-        <n-input-number v-if="model.triggerType === 2" v-model:value="model.infraredDuration" style="width: 140px">
+        <n-input-number v-if="model.triggerType === TriggerType.INFRARED" v-model:value="model.infraredDuration" style="width: 140px">
           <template #suffix><n-text depth="3">秒</n-text></template>
         </n-input-number>
       </template>

@@ -9,8 +9,14 @@ import {
   type IActionRow,
   type IDeviceRow,
   type IInputRow,
+  InputTagList,
   InputType,
   InputTypeList,
+  TriggerType,
+  TriggerTypeList,
+  upMaxAgid,
+  upMaxDid,
+  upMaxiid,
 } from "./types.ts";
 
 const deviceExportMap: Record<DeviceType, Record<string, string>> = {
@@ -28,10 +34,13 @@ const deviceExportMap: Record<DeviceType, Record<string, string>> = {
   rs485: { name: "n", code: "cd" },
   relay: { name: "n", channel: "ch" },
   dryContact: { name: "n", channel: "ch" },
+  doorbell: { name: "n", channel: "ch" },
   heartbeat: { name: "n" },
   roomState: { name: "n" },
   delayer: { name: "n" },
   actionGroupOp: { name: "n" },
+  snapshot: { name: "n" },
+  indicator: { name: "n" },
 };
 
 const deviceImportMap: Record<
@@ -52,6 +61,8 @@ export function serializeDevices(devices: IDeviceRow[]): any[] {
       did: device.did,
       type: DeviceTypeList.indexOf(device.type),
       ...(device.carryState ? { ct: device.carryState } : {}),
+      ...(device.linkDids.length > 0 ? { lkds: device.linkDids } : {}),
+      ...(device.repelDids.length > 0 ? { rpds: device.repelDids } : {}),
     };
     for (const k in device.payload) {
       const val = (device.payload as Record<string, any>)[k];
@@ -69,23 +80,36 @@ export function deserializeDevices(json: any[]): IDeviceRow[] {
     const carryState = Object.prototype.hasOwnProperty.call(o, "ct")
       ? o.ct
       : null;
+    const linkDids = Object.prototype.hasOwnProperty.call(o, "lkds")
+      ? o.lkds
+      : [];
+    const repelDids = Object.prototype.hasOwnProperty.call(o, "rpds")
+      ? o.rpds
+      : [];
 
-    // 跳过不想处理的类型
+    // 跳过预设的功能设备
     if (
       type === DeviceType.HEARTBEAT ||
       type === DeviceType.ROOM_STATE ||
       type === DeviceType.DELAYER ||
-      type === DeviceType.ACTION_GROUP_OP
+      type === DeviceType.ACTION_GROUP_OP ||
+      type === DeviceType.SNAPSHOT ||
+      type === DeviceType.INDICATOR
     )
       return [];
 
     const map = deviceImportMap[type];
     const payload: Record<string, any> = {};
     for (const k in o) {
-      if (k === "did" || k === "type") continue;
+      if (k === "type") continue;
+      else if (k === "did") {
+        upMaxDid(o[k]);
+      }
       payload[map[k] ?? k] = o[k];
     }
-    return [{ did, type, carryState, payload } as IDeviceRow];
+    return [
+      { did, type, carryState, linkDids, repelDids, payload } as IDeviceRow,
+    ];
   });
 }
 
@@ -95,28 +119,46 @@ export function serializeActionGroups(actionGroups: IActionGroupRow[]): any[] {
     n: actionGroup.name,
     aid: actionGroup.aid,
     m: actionGroup.isMode,
-    a: actionGroup.actions.map((act) => ({
-      t: act.targetId,
-      o: act.operation,
-      ...(act.parameter === '' || act.parameter == null ? {} : { p: act.parameter })
-    })),
+    a: actionGroup.actions.map((act) => {
+      const param = act.parameter;
+      return {
+        t: act.targetId,
+        o: act.operation,
+        ...(param === "" || param == null
+          ? {}
+          : typeof param === "string" ||
+            typeof param === "number" ||
+            typeof param === "boolean"
+          ? { p: String(param) }
+          : {}),
+      };
+    }),
   }));
 }
 
 export function deserializeActionGroups(json: any[]): IActionGroupRow[] {
-  return json.map((o) => ({
-    name: o.n,
-    aid: o.aid,
-    isMode: o.m,
-    actions: o.a.map(
-      (a: any) =>
-        ({
-          targetId: a.t,
-          operation: a.o,
-          parameter: Object.prototype.hasOwnProperty.call(a, "p") ? a.p : null,
-        } as IActionRow)
-    ),
-  }));
+  return json.flatMap((o) => {
+    const aid = o.aid as number;
+    upMaxAgid(aid);
+
+    const name = o.n;
+    const isMode = o.m;
+
+    const actions: IActionRow[] = o.a.map((a: any) => ({
+      targetId: a.t,
+      operation: a.o,
+      parameter: Object.prototype.hasOwnProperty.call(a, "p") ? a.p : null,
+    }));
+
+    return [
+      {
+        name,
+        aid,
+        isMode,
+        actions,
+      } as IActionGroupRow,
+    ];
+  });
 }
 
 // 输入正反序列化
@@ -127,13 +169,22 @@ export function serializeInputs(inputs: IInputRow[]): any[] {
       iid: input.iid,
       type: InputTypeList.indexOf(input.type),
       a: input.actionRounds.map((actRound) =>
-        actRound.map((act) => ({
-          t: act.targetId,
-          o: act.operation,
-          ...(act.parameter === '' || act.parameter == null ? {} : { p: act.parameter })
-        }))
+        actRound.map((act) => {
+          const param = act.parameter;
+          return {
+            t: act.targetId,
+            o: act.operation,
+            ...(param === "" || param == null
+              ? {}
+              : typeof param === "string" ||
+                typeof param === "number" ||
+                typeof param === "boolean"
+              ? { p: String(param) }
+              : {}),
+          };
+        })
       ),
-      ...(input.tags.length === 0 ? {} : { tg: input.tags }),
+      ...(input.tags ? { tg: InputTagList.indexOf(input.tags!) } : {}),
     };
 
     if (input.type === InputType.PANEL_BTN) {
@@ -141,14 +192,15 @@ export function serializeInputs(inputs: IInputRow[]): any[] {
         ...base,
         pid: input.pid,
         bid: input.bid,
+        ...(input.lightBindDid ? { lbd: input.lightBindDid } : {}),
       };
     } else if (input.type === InputType.DRY_CONTACT) {
       const temp = {
         ...base,
         ch: input.channel,
-        tt: input.triggerType,
+        tt: TriggerTypeList.indexOf(input.triggerType),
       };
-      if (temp.tt === 2) {
+      if (temp.tt === TriggerTypeList.indexOf(TriggerType.INFRARED)) {
         // 红外触发
         return {
           ...temp,
@@ -179,17 +231,22 @@ export function deserializeInputs(json: any[]): IInputRow[] {
             : null,
         }))
       ),
-      tags: Object.prototype.hasOwnProperty.call(o, "tg") ? o.tg : [],
+      tags: Object.prototype.hasOwnProperty.call(o, "tg")
+        ? InputTagList[o.tg]
+        : null,
     };
+    upMaxiid(base.iid!);
 
     if (base.type === InputType.PANEL_BTN) {
       base.pid = o.pid;
       base.bid = o.bid;
+      base.lightBindDid = Object.prototype.hasOwnProperty.call(o, "lbd")
+        ? o.lbd
+        : null;
     } else if (base.type === InputType.DRY_CONTACT) {
       base.channel = o.ch;
-      base.triggerType = o.tt;
-      if (base.triggerType === 2) {
-        // 红外检查
+      base.triggerType = TriggerTypeList[o.tt];
+      if (base.triggerType === TriggerType.INFRARED) {
         base.infraredDuration = o.du;
       }
     }
@@ -204,24 +261,36 @@ export function exportAll(
   actionGroups: IActionGroupRow[],
   inputs: IInputRow[]
 ) {
-  return JSON.stringify({
-    c: commonConfigs, // commons
-    d: serializeDevices(devs), // devices
-    a: serializeActionGroups(actionGroups), // actionGroups
-    i: serializeInputs(inputs), // inputs
-  });
+  return [
+    JSON.stringify({ type: "Laminor2" }),
+    JSON.stringify({ tm: new Date().toISOString().slice(0, 10) }),
+    JSON.stringify({ c: commonConfigs }),
+    JSON.stringify({ d: serializeDevices(devs) }),
+    JSON.stringify({ a: serializeActionGroups(actionGroups) }),
+    JSON.stringify({ i: serializeInputs(inputs) }),
+  ].join("\n");
 }
 
 export function importAll(
-  jsonStr: string,
+  ndjsonStr: string,
   commom: Ref<any>,
   trueDevices: Ref<IDeviceRow[]>,
   actionGroups: Ref<IActionGroupRow[]>,
   inputs: Ref<IInputRow[]>
 ) {
-  const data = JSON.parse(jsonStr);
-  commom.value = data.c;
-  trueDevices.value = deserializeDevices(data.d || []);
-  actionGroups.value = deserializeActionGroups(data.a || []);
-  inputs.value = deserializeInputs(data.i || []);
+  const lines = ndjsonStr.trim().split("\n");
+  if (lines.length < 2) {
+    throw new Error("Invalid NDJSON format: requires at least two lines");
+  }
+
+  const tm = JSON.parse(lines[1]);
+  const c = JSON.parse(lines[2]);
+  const d = JSON.parse(lines[3]);
+  const a = JSON.parse(lines[4]);
+  const i = JSON.parse(lines[5]);
+
+  commom.value = c.c;
+  trueDevices.value = deserializeDevices(d.d || []);
+  actionGroups.value = deserializeActionGroups(a.a || []);
+  inputs.value = deserializeInputs(i.i || []);
 }

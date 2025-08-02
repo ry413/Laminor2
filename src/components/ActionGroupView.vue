@@ -23,10 +23,14 @@ export const actionGroupRows = ref<IActionGroupRow[]>([])
 <template>
     <draggable v-model="actionGroupRows" item-key="id" handle=".drag-handle">
         <template #item="{ element, index }">
-            <div style="display:flex; align-items:center">
-                <span class="drag-handle" style="cursor:grab; padding-right:8px">☰</span>
-                <ActionGroupRow v-model:data="actionGroupRows[index]" :trueDevices="trueDeviceRows" :operationTargets="operationTargets" :actionGroups="actionGroupRows"
-                    @remove="actionGroupRows.splice(index, 1)" />
+            <div>
+                <n-divider />
+                <div style="display:flex; align-items:center">
+                    <span class="drag-handle" style="cursor:grab; padding-right:8px">☰</span>
+                    <ActionGroupRow :key="element.aid" v-model:data="actionGroupRows[index]"
+                        :trueDevices="trueDeviceRows" :operationTargets="operationTargets"
+                        :actionGroups="actionGroupRows" @remove="actionGroupRows.splice(index, 1)" />
+                </div>
             </div>
         </template>
     </draggable>

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import draggable from 'vuedraggable'
-import { DeviceType, getActionId, type IActionGroupRow, type IActionRow, type IDeviceRow } from '../types';
+import { DeviceType, type IActionGroupRow, type IActionRow, type IDeviceRow } from '../types';
 import ActionRow from './ActionRow.vue';
 
 const props = defineProps<{
@@ -21,7 +21,7 @@ const actions = computed({
 })
 
 /** 设备下拉 */
-const deviceOptions = computed(() =>
+const opeartionTargetOptions = computed(() =>
     props.operationTargets.map(d => {
         const name = d.payload?.name ?? `设备 #${d.did}`
         const channel = (d.payload && 'channel' in d.payload) ? ` (${(d.payload as any).channel})` : ''
@@ -35,7 +35,7 @@ const deviceOptions = computed(() =>
 /** 新增 */
 function addAction() {
     const dev = props.operationTargets[0]   // 可确认一定有一个目标
-    const a: IActionRow = { aid: getActionId(), targetId: dev.did, operation: '', parameter: null }
+    const a: IActionRow = { targetId: dev.did, operation: '', parameter: null }
     resetPayloadForDevice(a)           // 重置operation和parameter
     actions.value = [...actions.value, a]   // 产生新引用
 }
@@ -46,21 +46,6 @@ function removeAt(idx: number) {
     next.splice(idx, 1)
     actions.value = next
 }
-
-// watch(
-//     () => actions.value.map(a => ({ id: a.aid, t: a.targetId })),
-//     (n, o) => {
-//         n.forEach(({ id, t }) => {
-//             const prev = o.find(p => p.id === id)
-//             if (!prev || prev.t !== t) {
-//                 const act = actions.value.find(a => a.aid === id)!
-//                 const dev = props.operationTargets.find(d => d.did === t)
-//                 resetPayloadForDevice(act, dev)
-//             }
-//         })
-//     },
-//     { deep: true }
-// )
 
 /* ---------- 当 targetId 变更时，根据设备类型重置 Action.payload ---------- */
 function resetPayloadForDevice(act: IActionRow) {
@@ -90,6 +75,9 @@ function resetPayloadForDevice(act: IActionRow) {
         case DeviceType.DRY_CONTACT:
             act.operation = '开'
             break
+        case DeviceType.DOORBELL:
+            act.operation = '开'
+            break
         case DeviceType.HEARTBEAT:
             act.operation = '插卡'
             break
@@ -104,7 +92,12 @@ function resetPayloadForDevice(act: IActionRow) {
         case DeviceType.ACTION_GROUP_OP:
             act.operation = '调用'
             act.parameter = props.actionGroups[0]?.aid ?? -1
-            console.log("awdkanwdkanwdlk" + props.actionGroups.length + " adasd " + act.parameter)
+            break
+        case DeviceType.SNAPSHOT:
+            act.operation = '记录快照'
+            break
+        case DeviceType.INDICATOR:
+            act.operation = '亮'
             break
         default:
             break
@@ -119,7 +112,7 @@ function resetPayloadForDevice(act: IActionRow) {
                 <div class="action-row">
                     <span class="handle" style="cursor:grab">☰</span>
 
-                    <n-select v-model:value="act.targetId" :options="deviceOptions" style="width:140px" :consistent-menu-width="false" 
+                    <n-select v-model:value="act.targetId" :options="opeartionTargetOptions" style="width:140px" :consistent-menu-width="false"
                     @update:value="resetPayloadForDevice(act)"/>
 
                     <ActionRow :act="act" :trueDevices="props.trueDevices" :operationTargets="props.operationTargets"

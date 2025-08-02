@@ -14,6 +14,43 @@ const dtype = computed(() =>
   getDeviceType(props.act.targetId, props.operationTargets)
 )
 
+// INDICATOR 专用参数
+// 把 parameter 视作 "panelId,keyId" 这种格式
+function splitParam() {
+  return (props.act.parameter || '').split(',').slice(0, 2) as [string?, string?]
+}
+
+function writeParam(p?: string, k?: string) {
+  props.act.parameter = `${p ?? ''},${k ?? ''}`.replace(/^,|,$/g, '') // 去掉首尾单逗号
+}
+
+const panelId = computed<number | null>({
+  get() {
+    if (dtype.value !== DeviceType.INDICATOR) return null
+    const [p] = splitParam()
+    const n = Number(p)
+    return isNaN(n) ? null : n
+  },
+  set(v) {
+    const [, k] = splitParam()
+    writeParam(v != null ? String(v) : '', k)
+  }
+})
+
+const keyId = computed<number | null>({
+  get() {
+    if (dtype.value !== DeviceType.INDICATOR) return null
+    const [, k] = splitParam()
+    const n = Number(k)
+    return isNaN(n) ? null : n
+  },
+  set(v) {
+    const [p] = splitParam()
+    writeParam(p, v != null ? String(v) : '')
+  }
+})
+
+// 大概是delayer时长专用
 const parameterNum = computed<number | null>({
   get: () => {
     const n = Number(props.act.parameter)
@@ -24,6 +61,12 @@ const parameterNum = computed<number | null>({
     props.act.parameter = v != null ? String(v) : ''
   }
 })
+const actionGroupOptions = computed(() =>
+  props.actionGroups.map(g => ({
+    label: g.name,
+    value: String(g.aid)   // 统一成字符串
+  }))
+)
 </script>
 
 <template>
@@ -68,9 +111,14 @@ const parameterNum = computed<number | null>({
         :consistent-menu-width="false" />
     </template>
 
-    <template v-else-if="dtype === DeviceType.ROOM_STATE">
-      <n-select v-model:value="act.operation" :options="['添加', '删除', '反转', '如果存在此状态则跳出'].map(x => ({ label: x, value: x }))"
+    <template v-else-if="dtype === DeviceType.DOORBELL">
+      <n-select v-model:value="act.operation" :options="['开', '关', '反转'].map(x => ({ label: x, value: x }))"
         :consistent-menu-width="false" />
+    </template>
+
+    <template v-else-if="dtype === DeviceType.ROOM_STATE">
+      <n-select v-model:value="act.operation"
+        :options="['添加', '删除', '反转', '如果存在此状态则跳出'].map(x => ({ label: x, value: x }))" :consistent-menu-width="false" />
       <n-input v-model:value="act.parameter" style="width: 180px" :consistent-menu-width="false" />
     </template>
 
@@ -81,10 +129,28 @@ const parameterNum = computed<number | null>({
     </template>
 
     <template v-else-if="dtype === DeviceType.ACTION_GROUP_OP">
-      <n-select v-model:value="act.operation" :options="['调用', '中断', '生成任意键执行'].map(x => ({ label: x, value: x }))"
+      <n-select v-model:value="act.operation"
+        :options="['调用', '中断', '生成任意键执行', '删除任意键执行'].map(x => ({ label: x, value: x }))"
         :consistent-menu-width="false" />
-      <n-select v-model:value="act.parameter" :options="props.actionGroups.map(x => ({ label: x.name, value: x.aid }))"
+      <n-select v-if="act.operation != '删除任意键执行'" v-model:value="act.parameter"
+        :options="actionGroupOptions" :consistent-menu-width="false" />
+    </template>
+
+    <template v-else-if="dtype === DeviceType.SNAPSHOT">
+      <n-select v-model:value="act.operation"
+        :options="['记录快照', '读取并删除快照', '删除快照', '删除快照并跳出'].map(x => ({ label: x, value: x }))"
         :consistent-menu-width="false" />
+    </template>
+
+    <template v-else-if="dtype === DeviceType.INDICATOR">
+      <n-select v-model:value="act.operation" style="width: auto;"
+        :options="['亮', '灭', '亮1秒'].map(x => ({ label: x, value: x }))" :consistent-menu-width="false" />
+      <n-input-number v-model:value="panelId" placeholder="" :show-button="false" style="width: 90px;">
+        <template #prefix><n-text depth="3">面板ID</n-text></template>
+      </n-input-number>
+      <n-input-number v-model:value="keyId" placeholder="" :show-button="false" style="width: 90px;">
+        <template #prefix><n-text depth="3">按键ID</n-text></template>
+      </n-input-number>
     </template>
 
   </div>
