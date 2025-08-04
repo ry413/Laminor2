@@ -119,7 +119,7 @@ const actionGroupOptions = computed(() =>
     <template v-else-if="dtype === DeviceType.ROOM_STATE">
       <n-select v-model:value="act.operation"
         :options="['添加', '删除', '反转', '如果存在此状态则跳出'].map(x => ({ label: x, value: x }))" :consistent-menu-width="false" />
-      <n-input v-model:value="act.parameter" style="width: 180px" :consistent-menu-width="false" />
+      <n-input v-model:value="act.parameter" style="width: 180px" />
     </template>
 
     <template v-else-if="dtype === DeviceType.DELAYER">

@@ -44,9 +44,10 @@ export const DeviceTypeList = [
 export const InputType = {
   PANEL_BTN: "panelBtn",
   DRY_CONTACT: "dryContact",
+  VOICE_CMD: "voice_cmd"
 } as const;
 export type InputType = (typeof InputType)[keyof typeof InputType];
-export const InputTypeList = [InputType.PANEL_BTN, InputType.DRY_CONTACT];
+export const InputTypeList = [InputType.PANEL_BTN, InputType.DRY_CONTACT, InputType.VOICE_CMD];
 
 // 干接点输入的更细分类型
 export const TriggerType = {
@@ -204,13 +205,14 @@ export interface IInputRow {
   pid: number;
   bid: number;
   lightBindDid: number | null;
-  // pressedPolitAction: number
-  // pressedOtherPolitAction: number
 
   // 只对干接点输入类型有效, 其中infraredDuration只在输入为红外时有效
   channel: number;
   triggerType: TriggerType;
   infraredDuration: number;
+
+  // 只对语音指令有效
+  code: string;
 }
 
 /* ---------- 默认 payload 工厂 ---------- */

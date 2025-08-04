@@ -85,7 +85,8 @@ const currentActions = computed({
     <div>
       <n-select v-model:value="model.type" :options="[
         { label: '面板按键', value: InputType.PANEL_BTN },
-        { label: '干接点输入', value: InputType.DRY_CONTACT }
+        { label: '干接点输入', value: InputType.DRY_CONTACT },
+        { label: '语音输入', value: InputType.VOICE_CMD }
       ]" style="width: 110px" :consistent-menu-width="false" />
 
       <template v-if="model.type === InputType.PANEL_BTN">
@@ -111,6 +112,10 @@ const currentActions = computed({
         <n-input-number v-if="model.triggerType === TriggerType.INFRARED" v-model:value="model.infraredDuration" style="width: 140px">
           <template #suffix><n-text depth="3">秒</n-text></template>
         </n-input-number>
+      </template>
+
+      <template v-else-if="model.type === InputType.VOICE_CMD">
+          <n-input v-model:value="model.code" style="width: 180px" />
       </template>
     </div>
     <div>

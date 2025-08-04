@@ -210,6 +210,11 @@ export function serializeInputs(inputs: IInputRow[]): any[] {
         // 高低电平与红外超时
         return temp;
       }
+    } else if (input.type === InputType.VOICE_CMD) {
+      return {
+        ...base,
+        cd: input.code
+      }
     }
 
     return base; // fallback
@@ -249,6 +254,8 @@ export function deserializeInputs(json: any[]): IInputRow[] {
       if (base.triggerType === TriggerType.INFRARED) {
         base.infraredDuration = o.du;
       }
+    } else if (base.type === InputType.VOICE_CMD) {
+      base.code = o.cd
     }
 
     return base as IInputRow;
@@ -283,7 +290,7 @@ export function importAll(
     throw new Error("Invalid NDJSON format: requires at least two lines");
   }
 
-  const tm = JSON.parse(lines[1]);
+  // const tm = JSON.parse(lines[1]);
   const c = JSON.parse(lines[2]);
   const d = JSON.parse(lines[3]);
   const a = JSON.parse(lines[4]);

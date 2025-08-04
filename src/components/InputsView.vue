@@ -20,6 +20,7 @@ function addInput() {
     channel: 127,
     triggerType: TriggerType.HIGH_LEVEL,
     infraredDuration: 10,
+    code: ''
   })
 }
 </script>

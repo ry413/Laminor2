@@ -65,6 +65,7 @@ function resetPayloadForDevice(act: IActionRow) {
         case DeviceType.INFRARED_AIR:
         case DeviceType.SINGLE_AIR:
             act.operation = '开'
+            act.parameter = 22
             break
         case DeviceType.RS485:
             act.operation = '发送'
