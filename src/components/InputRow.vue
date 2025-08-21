@@ -109,22 +109,25 @@ const currentActions = computed({
           { label: '红外超时', value: TriggerType.INFRARED_TIMEOUT }
         ]" style="width: 110px" :consistent-menu-width="false" />
 
-        <n-input-number v-if="model.triggerType === TriggerType.INFRARED" v-model:value="model.infraredDuration" style="width: 140px">
+        <n-input-number v-if="model.triggerType === TriggerType.INFRARED" v-model:value="model.infraredDuration"
+          style="width: 140px">
           <template #suffix><n-text depth="3">秒</n-text></template>
         </n-input-number>
       </template>
 
       <template v-else-if="model.type === InputType.VOICE_CMD">
-          <n-input v-model:value="model.code" style="width: 180px" />
+        <n-input v-model:value="model.code" style="width: 180px" />
       </template>
     </div>
     <div>
-      <n-select v-model:value="model.tags" placeholder="额外标记" style="width: 130px;" :clearable="true" :options="[
-        { label: '拔卡时可用', value: InputTag.REMOVE_CARD_USABLE },
-        { label: '是插拔卡输入', value: InputTag.IS_ALIVE_CHANNEL },
-        { label: '是门磁输入', value: InputTag.IS_DOOR_CHANNEL },
-        { label: '是门铃输入', value: InputTag.IS_DOORBELL_CHANNEL },
-      ]" />
+      <n-select v-model:value="model.tags" placeholder="额外标记" style="width: 130px;" :clearable="true"
+        :consistent-menu-width="false" :options="[
+          { label: '拔卡时可用', value: InputTag.REMOVE_CARD_USABLE },
+          { label: '是插拔卡输入', value: InputTag.IS_ALIVE_CHANNEL },
+          { label: '是门磁输入', value: InputTag.IS_DOOR_CHANNEL },
+          { label: '是门铃输入', value: InputTag.IS_DOORBELL_CHANNEL },
+          { label: '忽略任意键执行', value: InputTag.IGNORE_ANY_KEY_EXECUTE }
+        ]" />
 
       <n-select v-if="model.type === InputType.PANEL_BTN" v-model:value="model.lightBindDid" placeholder="指示灯与设备状态同步"
         :clearable="true" :options="trueDeviceOptions" />

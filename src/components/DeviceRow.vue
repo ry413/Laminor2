@@ -170,6 +170,7 @@ const trueDeviceOptions = computed(() =>
             { label: '入住', value: '入住' },
             { label: '勿扰', value: '勿扰' },
             { label: '清理', value: '清理' },
+            { label: 'SOS', value: 'SOS' },
         ]" />
 
         <n-select multiple v-model:value="model.linkDids" placeholder="联动设备" style="width: 100px;" :clearable="true"
