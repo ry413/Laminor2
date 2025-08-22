@@ -18,6 +18,7 @@ const props = defineProps<{
   trueDevices: IDeviceRow[]
   operationTargets: IDeviceRow[]
   actionGroups: IActionGroupRow[]
+  index: number
 }>()
 
 const emit = defineEmits<{
@@ -55,15 +56,15 @@ function nextRound() {
   );
 }
 
-function addRound() {
-  props.data.actionRounds.push([])
-  selectedRound.value = props.data.actionRounds.length - 1
-}
+// function addRound() {
+//   props.data.actionRounds.push([])
+//   selectedRound.value = props.data.actionRounds.length - 1
+// }
 
-function removeCurrentRound() {
-  props.data.actionRounds.splice(selectedRound.value, 1)
-  selectedRound.value = Math.min(selectedRound.value, props.data.actionRounds.length - 1);
-}
+// function removeCurrentRound() {
+//   props.data.actionRounds.splice(selectedRound.value, 1)
+//   selectedRound.value = Math.min(selectedRound.value, props.data.actionRounds.length - 1);
+// }
 
 const currentActions = computed({
   get: () => props.data.actionRounds[selectedRound.value],
@@ -76,7 +77,11 @@ const currentActions = computed({
 <template>
   <!-- 输入行本体 -->
   <div class="input-row">
-    <p>{{ props.data.iid }}</p>
+    <!-- <p>{{ props.data.iid }}</p> -->
+
+    <p style="min-width: 20px; text-align: right; ">
+      {{ props.index + 1 }}
+    </p>
     <n-input v-model:value="model.name" placeholder="" style="width: 140px;">
       <template #prefix><n-text depth="3">名称:</n-text></template>
     </n-input>
@@ -134,13 +139,13 @@ const currentActions = computed({
     </div>
 
     <!-- 移除整行按钮 -->
-    <n-button quaternary circle @click="emit('remove')">✕</n-button>
+    <n-button type="error" style="margin-right: 6px;" ghost @click="emit('remove')">删除本行</n-button>
   </div>
 
   <div style="display: flex; flex-direction: column">
-    <div>当前: {{ selectedRound + 1 }} / {{ model.actionRounds.length }}</div>
+    <!-- <div>当前: {{ selectedRound + 1 }} / {{ model.actionRounds.length }}</div>
     <n-button @click="addRound">添加新轮次</n-button>
-    <n-button @click="removeCurrentRound" v-if="model.actionRounds.length > 1">删除轮次</n-button>
+    <n-button @click="removeCurrentRound" v-if="model.actionRounds.length > 1">删除轮次</n-button> -->
   </div>
   <div style="display: flex; flex-direction: column" v-if="model.actionRounds.length > 1">
     <n-button @click="prevRound">上一组</n-button>
@@ -156,7 +161,6 @@ const currentActions = computed({
   display: flex;
   gap: 8px;
   align-items: center;
-  margin-bottom: 4px;
 }
 
 .actions {

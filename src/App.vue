@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { actionGroupRows } from './components/ActionGroupView.vue';
-import { trueDeviceRows, operationTargets } from './components/DevicesView.vue';
 import { commonConfigs } from './components/HomeView.vue';
 import { inputRows } from './components/InputsView.vue';
 import SidebarMenu from './components/SidebarMenu.vue';
 import { exportAll, importAll } from './io';
 import mqtt from 'mqtt';
+import { useDevices } from './store/devices';
 
 const brokerUrl = import.meta.env.VITE_MQTT_BROKER;
 const username = import.meta.env.VITE_MQTT_USERNAME;
 const password = import.meta.env.VITE_MQTT_PASSWORD;
-
 let client: mqtt.MqttClient | null = null;
+
+const { trueDeviceRows, allTargets } = useDevices() 
 
 const targetSerialNum = ref("")
 
 function downloadConfig() {
-  const text = exportAll(commonConfigs.value, operationTargets.value, actionGroupRows.value, inputRows.value)
+  const text = exportAll(commonConfigs.value, allTargets.value, actionGroupRows.value, inputRows.value)
   const blob = new Blob([text], { type: 'application/x-ndjson' })
 
   const a = document.createElement('a')
@@ -29,7 +30,7 @@ function downloadConfig() {
 
 function sendConfig() {
   console.log('Sending to:', targetSerialNum.value);
-  const text = exportAll(commonConfigs.value, operationTargets.value, actionGroupRows.value, inputRows.value);
+  const text = exportAll(commonConfigs.value, allTargets.value, actionGroupRows.value, inputRows.value);
 
   client = mqtt.connect(brokerUrl, {
     username, password

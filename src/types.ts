@@ -44,10 +44,14 @@ export const DeviceTypeList = [
 export const InputType = {
   PANEL_BTN: "panelBtn",
   DRY_CONTACT: "dryContact",
-  VOICE_CMD: "voice_cmd"
+  VOICE_CMD: "voice_cmd",
 } as const;
 export type InputType = (typeof InputType)[keyof typeof InputType];
-export const InputTypeList = [InputType.PANEL_BTN, InputType.DRY_CONTACT, InputType.VOICE_CMD];
+export const InputTypeList = [
+  InputType.PANEL_BTN,
+  InputType.DRY_CONTACT,
+  InputType.VOICE_CMD,
+];
 
 // 干接点输入的更细分类型
 export const TriggerType = {
@@ -80,6 +84,9 @@ export const InputTagList = [
   InputTag.IS_DOORBELL_CHANNEL,
   InputTag.IGNORE_ANY_KEY_EXECUTE,
 ];
+
+// 房间状态
+export const RoomStates = ["入住", "清理", "勿扰", "SOS"];
 
 /* ---------- 各设备 payload 详细结构 ---------- */
 export interface LampPayload {

@@ -3,17 +3,18 @@ import { computed } from 'vue'
 import { NButton } from 'naive-ui'
 
 import {
-    type IDeviceRow,
     type IActionGroupRow,
 } from '../types.ts'
 import ActionList from './ActionList.vue'
+import { useDevices } from '../store/devices.ts'
+
+const { trueDeviceRows } = useDevices()
 
 /* ---------- props / emits ---------- */
 const props = defineProps<{
     data: IActionGroupRow
-    trueDevices: IDeviceRow[]
-    operationTargets: IDeviceRow[]
     actionGroups: IActionGroupRow[]
+    index: number
 }>()
 
 const emit = defineEmits<{
@@ -30,17 +31,20 @@ const model = computed({
 
 <template>
     <div class="input-row">
-        <p>{{ props.data.aid }}</p>
+        <!-- <p>{{ props.data.aid }}</p> -->
+        <p style="min-width: 20px; text-align: right; ">
+            {{ props.index + 1 }}
+        </p>
         <n-input v-model:value="model.name" placeholder="" style="width: 140px;">
             <template #prefix><n-text depth="3">名称:</n-text></template>
         </n-input>
 
-        <n-button quaternary circle @click="emit('remove')">✕</n-button>
+        <n-button type="error" ghost @click="emit('remove')">删除本行</n-button>
         <p>是模式</p>
         <n-switch v-model:value="model.isMode" />
     </div>
 
-    <ActionList v-model="model.actions" :trueDevices="props.trueDevices" :operationTargets="props.operationTargets" :actionGroups="props.actionGroups" />
+    <ActionList v-model="model.actions" :trueDevices="trueDeviceRows" :actionGroups="props.actionGroups" />
 
 </template>
 
@@ -49,7 +53,6 @@ const model = computed({
     display: flex;
     gap: 8px;
     align-items: center;
-    margin-bottom: 4px;
 }
 
 .actions {

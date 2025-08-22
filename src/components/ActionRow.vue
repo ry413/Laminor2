@@ -1,7 +1,7 @@
 <!-- ActionRow.vue -->
 <script setup lang="ts">
 import { computed } from 'vue';
-import { DeviceType, getDeviceType, type IActionGroupRow, type IActionRow, type IDeviceRow } from '../types';
+import { DeviceType, getDeviceType, RoomStates, type IActionGroupRow, type IActionRow, type IDeviceRow } from '../types';
 
 const props = defineProps<{
   act: IActionRow
@@ -21,13 +21,14 @@ function splitParam() {
 }
 
 function writeParam(p?: string, k?: string) {
-  props.act.parameter = `${p ?? ''},${k ?? ''}`.replace(/^,|,$/g, '') // 去掉首尾单逗号
+  props.act.parameter = `${p ?? ''},${k ?? ''}`
 }
 
 const panelId = computed<number | null>({
   get() {
     if (dtype.value !== DeviceType.INDICATOR) return null
     const [p] = splitParam()
+    if (p === undefined || p === '') return 0 // 默认显示为 0，但不写回
     const n = Number(p)
     return isNaN(n) ? null : n
   },
@@ -41,6 +42,7 @@ const keyId = computed<number | null>({
   get() {
     if (dtype.value !== DeviceType.INDICATOR) return null
     const [, k] = splitParam()
+    if (k === undefined || k === '') return 0 // 默认显示为 0，但不写回
     const n = Number(k)
     return isNaN(n) ? null : n
   },
@@ -119,7 +121,8 @@ const actionGroupOptions = computed(() =>
     <template v-else-if="dtype === DeviceType.ROOM_STATE">
       <n-select v-model:value="act.operation"
         :options="['添加', '删除', '反转', '如果存在此状态则跳出'].map(x => ({ label: x, value: x }))" :consistent-menu-width="false" />
-      <n-input v-model:value="act.parameter" style="width: 180px" />
+      <n-select v-model:value="act.parameter" :options="RoomStates.map(x => ({ label: x, value: x }))"
+        :consistent-menu-width="false" />
     </template>
 
     <template v-else-if="dtype === DeviceType.DELAYER">
@@ -132,8 +135,8 @@ const actionGroupOptions = computed(() =>
       <n-select v-model:value="act.operation"
         :options="['调用', '中断', '生成任意键执行', '删除任意键执行'].map(x => ({ label: x, value: x }))"
         :consistent-menu-width="false" />
-      <n-select v-if="act.operation != '删除任意键执行'" v-model:value="act.parameter"
-        :options="actionGroupOptions" :consistent-menu-width="false" />
+      <n-select v-if="act.operation != '删除任意键执行'" v-model:value="act.parameter" :options="actionGroupOptions"
+        :consistent-menu-width="false" />
     </template>
 
     <template v-else-if="dtype === DeviceType.SNAPSHOT">
