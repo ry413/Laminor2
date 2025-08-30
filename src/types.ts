@@ -209,7 +209,7 @@ export interface IInputRow {
   iid: number;
   type: InputType;
   actionRounds: IActionRow[][];
-  tags: InputTag | null;
+  tags: InputTag[];
   // 只对面板按键类型有效
   pid: number;
   bid: number;

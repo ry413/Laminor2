@@ -100,10 +100,12 @@ export function deserializeDevices(json: any[]): IDeviceRow[] {
 
     const map = deviceImportMap[type];
     const payload: Record<string, any> = {};
+    const TOP_LEVEL = new Set(["type", "did", "ct", "lkds", "rpds"]);
+
     for (const k in o) {
-      if (k === "type") continue;
-      else if (k === "did") {
-        upMaxDid(o[k]);
+      if (TOP_LEVEL.has(k)) {
+        if (k === "did") upMaxDid(o[k]);
+        continue;
       }
       payload[map[k] ?? k] = o[k];
     }
@@ -184,7 +186,9 @@ export function serializeInputs(inputs: IInputRow[]): any[] {
           };
         })
       ),
-      ...(input.tags ? { tg: InputTagList.indexOf(input.tags!) } : {}),
+      ...(input.tags.length > 0
+        ? { tgs: input.tags.map((t) => InputTagList.indexOf(t)) }
+        : {}),
     };
 
     if (input.type === InputType.PANEL_BTN) {
@@ -213,8 +217,8 @@ export function serializeInputs(inputs: IInputRow[]): any[] {
     } else if (input.type === InputType.VOICE_CMD) {
       return {
         ...base,
-        cd: input.code
-      }
+        cd: input.code,
+      };
     }
 
     return base; // fallback
@@ -236,9 +240,12 @@ export function deserializeInputs(json: any[]): IInputRow[] {
             : null,
         }))
       ),
+      // 兼容旧版"tg"
       tags: Object.prototype.hasOwnProperty.call(o, "tg")
-        ? InputTagList[o.tg]
-        : null,
+        ? [InputTagList[o.tg]]
+        : Object.prototype.hasOwnProperty.call(o, "tgs")
+        ? o.tgs.map((t: number) => InputTagList[t])
+        : [],
     };
     upMaxiid(base.iid!);
 
@@ -255,7 +262,7 @@ export function deserializeInputs(json: any[]): IInputRow[] {
         base.infraredDuration = o.du;
       }
     } else if (base.type === InputType.VOICE_CMD) {
-      base.code = o.cd
+      base.code = o.cd;
     }
 
     return base as IInputRow;

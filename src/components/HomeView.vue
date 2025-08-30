@@ -34,7 +34,7 @@ export const commonConfigs: Ref = ref({
       <n-form-item label="配置名称" path="configName">
         <n-input v-model:value="commonConfigs.configName" placeholder="输入" />
       </n-form-item>
-      <h2 style="text-align: center;">空调配置</h2>
+      <!-- <h2 style="text-align: center;">空调配置</h2>
       <n-form-item label="默认目标温度" path="airConfig.defaultTargetTemp">
         <n-select v-model:value="commonConfigs.airConfig.defaultTargetTemp" :options="Array.from({ length: 16 }, (_, i) => {
           const num = i + 16
@@ -110,7 +110,7 @@ export const commonConfigs: Ref = ref({
           { label: '高风', value: 2 },
           { label: '自动', value: 3 },
         ]" />
-      </n-form-item>
+      </n-form-item> -->
     </n-form>
   </div>
 </template>

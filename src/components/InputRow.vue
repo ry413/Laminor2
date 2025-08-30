@@ -125,7 +125,7 @@ const currentActions = computed({
       </template>
     </div>
     <div>
-      <n-select v-model:value="model.tags" placeholder="额外标记" style="width: 130px;" :clearable="true"
+      <n-select v-model:value="model.tags" placeholder="额外标记" style="width: 130px;" multiple :clearable="true"
         :consistent-menu-width="false" :options="[
           { label: '拔卡时可用', value: InputTag.REMOVE_CARD_USABLE },
           { label: '是插拔卡输入', value: InputTag.IS_ALIVE_CHANNEL },
