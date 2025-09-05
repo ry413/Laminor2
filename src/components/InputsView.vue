@@ -14,7 +14,7 @@ function addInput() {
     iid: getInputId(),
     type: InputType.PANEL_BTN,
     actionRounds: [],
-    tags: null,
+    tags: [],
     lightBindDid: null,
     pid: 0,
     bid: 0,

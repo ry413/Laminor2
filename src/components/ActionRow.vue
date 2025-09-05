@@ -118,6 +118,11 @@ const actionGroupOptions = computed(() =>
         :consistent-menu-width="false" />
     </template>
 
+    <template v-else-if="dtype === DeviceType.BGM">
+      <n-select v-model:value="act.operation" :options="['打开功放', '关闭功放', '播放', '停止', '播放/暂停', '上一首', '下一首', '音量加', '音量减', '打开蓝牙模式', '关闭蓝牙模式', '反转模式'].map(x => ({ label: x, value: x }))"
+        :consistent-menu-width="false" />
+    </template>
+
     <template v-else-if="dtype === DeviceType.ROOM_STATE">
       <n-select v-model:value="act.operation"
         :options="['添加', '删除', '反转', '如果存在此状态则跳出'].map(x => ({ label: x, value: x }))" :consistent-menu-width="false" />

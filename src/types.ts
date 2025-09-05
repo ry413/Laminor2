@@ -5,6 +5,14 @@
 
 // 设备类型
 export const DeviceType = {
+  // 预设设备
+  HEARTBEAT: "heartbeat",
+  ROOM_STATE: "roomState",
+  DELAYER: "delayer",
+  ACTION_GROUP_OP: "actionGroupOp",
+  SNAPSHOT: "snapshot",
+  INDICATOR: "indicator",
+
   LAMP: "lamp",
   CURTAIN: "curtain",
   INFRARED_AIR: "infraredAir",
@@ -13,17 +21,17 @@ export const DeviceType = {
   RELAY: "relay",
   DRY_CONTACT: "dryContact",
   DOORBELL: "doorbell",
-
-  // 预设
-  HEARTBEAT: "heartbeat",
-  ROOM_STATE: "roomState",
-  DELAYER: "delayer",
-  ACTION_GROUP_OP: "actionGroupOp",
-  SNAPSHOT: "snapshot",
-  INDICATOR: "indicator",
+  BGM: "bgm",
 } as const;
 export type DeviceType = (typeof DeviceType)[keyof typeof DeviceType];
 export const DeviceTypeList = [
+  DeviceType.HEARTBEAT,
+  DeviceType.ROOM_STATE,
+  DeviceType.DELAYER,
+  DeviceType.ACTION_GROUP_OP,
+  DeviceType.SNAPSHOT,
+  DeviceType.INDICATOR,
+
   DeviceType.LAMP,
   DeviceType.CURTAIN,
   DeviceType.INFRARED_AIR,
@@ -32,12 +40,7 @@ export const DeviceTypeList = [
   DeviceType.RELAY,
   DeviceType.DRY_CONTACT,
   DeviceType.DOORBELL,
-  DeviceType.HEARTBEAT,
-  DeviceType.ROOM_STATE,
-  DeviceType.DELAYER,
-  DeviceType.ACTION_GROUP_OP,
-  DeviceType.SNAPSHOT,
-  DeviceType.INDICATOR,
+  DeviceType.BGM,
 ];
 
 // 输入类型
@@ -135,6 +138,10 @@ export interface DoorbellPayload {
   channel: number;
 }
 
+export interface BGMPayload {
+  name: string;
+}
+
 // 这些是单例, 不该有负载
 export interface HeartbeatPayload {
   name: string;
@@ -170,6 +177,8 @@ export interface DevicePayloadMap {
   [DeviceType.RELAY]: RelayPayload;
   [DeviceType.DRY_CONTACT]: DryContactPayload;
   [DeviceType.DOORBELL]: DoorbellPayload;
+  [DeviceType.BGM]: BGMPayload;
+  
   [DeviceType.HEARTBEAT]: HeartbeatPayload;
   [DeviceType.ROOM_STATE]: RoomStatePayload;
   [DeviceType.DELAYER]: DelayerPayload;
@@ -255,6 +264,11 @@ export function createDefaultDevicePayload<T extends keyof DevicePayloadMap>(
       return { name: "", channel: 127 } as DevicePayloadMap[T];
     case DeviceType.DRY_CONTACT:
       return { name: "", channel: 127 } as DevicePayloadMap[T];
+    case DeviceType.DOORBELL:
+      return { name: "", channel: 127 } as DevicePayloadMap[T];
+    case DeviceType.BGM:  
+      return { name: "" } as DevicePayloadMap[T];
+
     case DeviceType.HEARTBEAT:
       return { name: "更改心跳包" } as DevicePayloadMap[T];
     case DeviceType.ROOM_STATE:

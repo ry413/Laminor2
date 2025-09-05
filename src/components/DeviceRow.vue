@@ -11,7 +11,8 @@ const typeOptions = [
     { label: '485指令', key: DeviceType.RS485 },
     { label: '继电器输出', key: DeviceType.RELAY },
     { label: '干接点输出', key: DeviceType.DRY_CONTACT },
-    { label: '门铃', key: DeviceType.DOORBELL }
+    { label: '门铃', key: DeviceType.DOORBELL },
+    { label: '蓝牙背景音乐', key: DeviceType.BGM },
 ]
 
 const props = defineProps<{
@@ -172,6 +173,13 @@ const trueDeviceOptions = computed(() =>
             </n-input-number>
         </template>
 
+        <!-- 蓝牙背景音乐 -->
+        <template v-if="model.type === DeviceType.BGM">
+            <n-input v-model:value="model.payload.name" placeholder="" class="name-input">
+                <template #prefix><n-text depth="3">名称:</n-text></template>
+            </n-input>
+        </template>
+
         <!-- 干接点输出 -->
         <template v-if="model.type === DeviceType.DRY_CONTACT">
             <n-input v-model:value="model.payload.name" placeholder="" class="name-input">
@@ -183,13 +191,16 @@ const trueDeviceOptions = computed(() =>
             </n-input-number>
         </template>
 
-        <n-select v-model:value="model.carryState" placeholder="携带状态" style="width: 100px;" :clearable="true"
-            :options="RoomStates.map(x => ({ label: x, value: x }))" />
+        <template
+            v-if="model.type === DeviceType.LAMP || model.type === DeviceType.RELAY || model.type === DeviceType.DRY_CONTACT">
+            <n-select v-model:value="model.carryState" placeholder="携带状态" style="width: 100px;" :clearable="true"
+                :options="RoomStates.map(x => ({ label: x, value: x }))" />
 
-        <n-select multiple v-model:value="model.linkDids" placeholder="联动设备" style="width: 140px;" :clearable="true"
-            :consistent-menu-width="false" :options=trueDeviceOptions />
-        <n-select multiple v-model:value="model.repelDids" placeholder="排斥设备" style="width: 140px;" :clearable="true"
-            :consistent-menu-width="false" :options=trueDeviceOptions />
+            <n-select multiple v-model:value="model.linkDids" placeholder="联动设备" style="width: 140px;" :clearable="true"
+                :consistent-menu-width="false" :options=trueDeviceOptions />
+            <n-select multiple v-model:value="model.repelDids" placeholder="排斥设备" style="width: 140px;"
+                :clearable="true" :consistent-menu-width="false" :options=trueDeviceOptions />
+        </template>
 
         <n-button type="error" ghost @click="emit('remove')">删除本行</n-button>
     </div>

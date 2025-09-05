@@ -18,6 +18,7 @@ import {
   upMaxDid,
   upMaxiid,
 } from "./types.ts";
+import type { CommonConfigs } from "./components/HomeView.vue";
 
 const deviceExportMap: Record<DeviceType, Record<string, string>> = {
   lamp: { name: "n", channel: "ch" },
@@ -35,6 +36,7 @@ const deviceExportMap: Record<DeviceType, Record<string, string>> = {
   relay: { name: "n", channel: "ch" },
   dryContact: { name: "n", channel: "ch" },
   doorbell: { name: "n", channel: "ch" },
+  bgm: { name: "n" },
   heartbeat: { name: "n" },
   roomState: { name: "n" },
   delayer: { name: "n" },
@@ -270,7 +272,7 @@ export function deserializeInputs(json: any[]): IInputRow[] {
 }
 
 export function exportAll(
-  commonConfigs: Ref,
+  commonConfigs: CommonConfigs,
   devs: IDeviceRow[],
   actionGroups: IActionGroupRow[],
   inputs: IInputRow[]

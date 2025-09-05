@@ -105,6 +105,9 @@ function resetPayloadForDevice(act: IActionRow) {
         case DeviceType.DOORBELL:
             act.operation = '开'
             break
+        case DeviceType.BGM:
+            act.operation = '播放'
+            break
         case DeviceType.HEARTBEAT:
             act.operation = '插卡'
             break

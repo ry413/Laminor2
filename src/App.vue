@@ -127,7 +127,7 @@ function handleFile(file: File) {
 
     <n-layout>
       <n-layout-header bordered>
-        <h2 style="margin: 0 16px">Laminor2</h2>
+        <h2 style="margin: 0 16px">Laminor2 - 1.1.0</h2>
       </n-layout-header>
       <n-layout-content style="padding: 24px;">
         <RouterView />
