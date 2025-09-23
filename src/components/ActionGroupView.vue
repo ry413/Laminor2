@@ -36,7 +36,7 @@ export const actionGroupRows = ref<IActionGroupRow[]>([])
     <n-float-button :right="100" :bottom="100" :width="100" shape="square" type="primary" @click="addActionGroup">
         <template #description>
             <div style="font-size: 20px;">
-                添加模式
+                添加组合
             </div>
         </template>
     </n-float-button>

@@ -56,15 +56,15 @@ function nextRound() {
   );
 }
 
-// function addRound() {
-//   props.data.actionRounds.push([])
-//   selectedRound.value = props.data.actionRounds.length - 1
-// }
+function addRound() {
+  props.data.actionRounds.push([])
+  selectedRound.value = props.data.actionRounds.length - 1
+}
 
-// function removeCurrentRound() {
-//   props.data.actionRounds.splice(selectedRound.value, 1)
-//   selectedRound.value = Math.min(selectedRound.value, props.data.actionRounds.length - 1);
-// }
+function removeCurrentRound() {
+  props.data.actionRounds.splice(selectedRound.value, 1)
+  selectedRound.value = Math.min(selectedRound.value, props.data.actionRounds.length - 1);
+}
 
 const currentActions = computed({
   get: () => props.data.actionRounds[selectedRound.value],
@@ -121,7 +121,7 @@ const currentActions = computed({
       </template>
 
       <template v-else-if="model.type === InputType.VOICE_CMD">
-        <n-input v-model:value="model.code" style="width: 180px" />
+        <n-input v-model:value="model.code" placeholder="指令码" style="width: 180px" />
       </template>
     </div>
     <div>
@@ -134,7 +134,7 @@ const currentActions = computed({
           { label: '忽略任意键执行', value: InputTag.IGNORE_ANY_KEY_EXECUTE }
         ]" />
 
-      <n-select v-if="model.type === InputType.PANEL_BTN" v-model:value="model.lightBindDid" placeholder="指示灯与设备状态同步"
+      <n-select v-if="model.type === InputType.PANEL_BTN" v-model:value="model.lightBindDid" placeholder="指示灯同步于"
         :clearable="true" :options="trueDeviceOptions" />
     </div>
 
@@ -143,9 +143,9 @@ const currentActions = computed({
   </div>
 
   <div style="display: flex; flex-direction: column">
-    <!-- <div>当前: {{ selectedRound + 1 }} / {{ model.actionRounds.length }}</div>
+    <div>当前: {{ selectedRound + 1 }} / {{ model.actionRounds.length }}</div>
     <n-button @click="addRound">添加新轮次</n-button>
-    <n-button @click="removeCurrentRound" v-if="model.actionRounds.length > 1">删除轮次</n-button> -->
+    <n-button @click="removeCurrentRound" v-if="model.actionRounds.length > 1">删除轮次</n-button>
   </div>
   <div style="display: flex; flex-direction: column" v-if="model.actionRounds.length > 1">
     <n-button @click="prevRound">上一组</n-button>

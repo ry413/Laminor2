@@ -11,7 +11,7 @@ import {
     HomeOutline as HomeIcon,
     GridOutline as DevicesIcon,
     EnterOutline as InputsIcon,
-    
+    ReceiptOutline as ActionGroupIcon
 } from '@vicons/ionicons5'
 
 import { NIcon } from 'naive-ui'
@@ -60,10 +60,10 @@ const menuOptions: MenuOption[] = [
                         path: '/actionGroups'
                     }
                 },
-                { default: () => '模式定义' }
+                { default: () => '动作组合' }
             ),
         key: 'actionGroups',
-        icon: renderIcon(DevicesIcon)
+        icon: renderIcon(ActionGroupIcon)
     },
 
     {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { createDiscreteApi } from 'naive-ui'
 import { actionGroupRows } from './components/ActionGroupView.vue';
 import { commonConfigs } from './components/HomeView.vue';
 import { inputRows } from './components/InputsView.vue';
@@ -13,7 +14,12 @@ const username = import.meta.env.VITE_MQTT_USERNAME;
 const password = import.meta.env.VITE_MQTT_PASSWORD;
 let client: mqtt.MqttClient | null = null;
 
-const { trueDeviceRows, allTargets } = useDevices() 
+const isSending = ref(false)
+const { message } = createDiscreteApi(['message'])
+
+
+
+const { trueDeviceRows, allTargets } = useDevices()
 
 const targetSerialNum = ref("")
 
@@ -47,6 +53,18 @@ function sendConfig() {
   client.on('error', (err) => {
     console.error('MQTT connection error:', err);
   });
+}
+
+function onConfirm() {
+  try {
+    isSending.value = true
+    sendConfig()
+    message.success('已下发配置')
+  } catch (e) {
+    message.error('下发失败')
+  } finally {
+    isSending.value = false
+  }
 }
 
 async function fetchConfig() {
@@ -115,7 +133,13 @@ function handleFile(file: File) {
       <div class="sider-wrapper">
         <SidebarMenu />
         <n-input :show-button="false" v-model:value="targetSerialNum" placeholder="目标序列号"></n-input>
-        <n-button @click="sendConfig">直接发送配置</n-button>
+        <!-- <n-button @click="sendConfig">直接发送配置</n-button> -->
+        <n-popconfirm positive-text="取消" negative-text="确认发送" :show-icon="true" @negative-click="onConfirm">
+          <template #trigger>
+            <n-button :loading="isSending">发送配置</n-button>
+          </template>
+          该操作会覆盖线上配置, 可能导致设备状态变化, 是否继续?
+        </n-popconfirm>
         <n-button @click="downloadConfig">下载文件</n-button>
         <n-button @click="fetchConfig">拉取配置</n-button>
         <input type="file" accept=".ndjson" @change="(e) => {
@@ -127,7 +151,7 @@ function handleFile(file: File) {
 
     <n-layout>
       <n-layout-header bordered>
-        <h2 style="margin: 0 16px">Laminor2 - 1.1.0</h2>
+        <h2 style="margin: 0 16px">Laminor2 - 1.1.1 -- 适配XZRCU - 1.1.x 版本</h2>
       </n-layout-header>
       <n-layout-content style="padding: 24px;">
         <RouterView />

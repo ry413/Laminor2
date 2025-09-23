@@ -270,15 +270,15 @@ export function createDefaultDevicePayload<T extends keyof DevicePayloadMap>(
       return { name: "" } as DevicePayloadMap[T];
 
     case DeviceType.HEARTBEAT:
-      return { name: "更改心跳包" } as DevicePayloadMap[T];
+      return { name: "更改心跳" } as DevicePayloadMap[T];
     case DeviceType.ROOM_STATE:
-      return { name: "房间状态操作" } as DevicePayloadMap[T];
+      return { name: "房间状态" } as DevicePayloadMap[T];
     case DeviceType.DELAYER:
       return { name: "延时" } as DevicePayloadMap[T];
     case DeviceType.ACTION_GROUP_OP:
-      return { name: "模式操作" } as DevicePayloadMap[T];
+      return { name: "动作组合" } as DevicePayloadMap[T];
     case DeviceType.SNAPSHOT:
-      return { name: "房间状态快照" } as DevicePayloadMap[T];
+      return { name: "房间快照" } as DevicePayloadMap[T];
     default:
       return {} as DevicePayloadMap[T];
   }

@@ -1,6 +1,6 @@
 <!-- ActionRow.vue -->
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { DeviceType, getDeviceType, RoomStates, type IActionGroupRow, type IActionRow, type IDeviceRow } from '../types';
 
 const props = defineProps<{
@@ -24,13 +24,25 @@ function writeParam(p?: string, k?: string) {
   props.act.parameter = `${p ?? ''},${k ?? ''}`
 }
 
+const isIndicator = computed(() => dtype.value === DeviceType.INDICATOR)
+
+function ensureIndicatorDefaults() {
+  if (!isIndicator.value) return
+  const [p, k] = splitParam()
+  const np = (p === undefined || p === '') ? '0' : p
+  const nk = (k === undefined || k === '') ? '0' : k
+  if (np !== p || nk !== k) writeParam(np, nk) // ← 只在需要时写一次
+}
+
+// 初始进来 & dtype 切换时兜底写回
+watch(isIndicator, (on) => { if (on) ensureIndicatorDefaults() }, { immediate: true })
+
 const panelId = computed<number | null>({
   get() {
-    if (dtype.value !== DeviceType.INDICATOR) return null
+    if (!isIndicator.value) return null
     const [p] = splitParam()
-    if (p === undefined || p === '') return 0 // 默认显示为 0，但不写回
     const n = Number(p)
-    return isNaN(n) ? null : n
+    return (p === undefined || p === '') ? null : (isNaN(n) ? null : n)
   },
   set(v) {
     const [, k] = splitParam()
@@ -40,11 +52,10 @@ const panelId = computed<number | null>({
 
 const keyId = computed<number | null>({
   get() {
-    if (dtype.value !== DeviceType.INDICATOR) return null
+    if (!isIndicator.value) return null
     const [, k] = splitParam()
-    if (k === undefined || k === '') return 0 // 默认显示为 0，但不写回
     const n = Number(k)
-    return isNaN(n) ? null : n
+    return (k === undefined || k === '') ? null : (isNaN(n) ? null : n)
   },
   set(v) {
     const [p] = splitParam()
@@ -85,9 +96,9 @@ const actionGroupOptions = computed(() =>
 
     <template v-else-if="dtype === DeviceType.INFRARED_AIR || dtype === DeviceType.SINGLE_AIR">
       <n-select v-model:value="act.operation"
-        :options="['开', '关', '设置温度', '制冷', '制热', '通风', '低风', '中风', '高风', '风量加大', '风量减小', '温度升高', '温度降低'].map(x => ({ label: x, value: x }))"
+        :options="['开', '关', '调节温度', '制冷', '制热', '通风', '低风', '中风', '高风', '风量加大', '风量减小', '温度升高', '温度降低'].map(x => ({ label: x, value: x }))"
         :consistent-menu-width="false" />
-      <n-select v-if="act.operation === '设置温度'" v-model:value="act.parameter" :consistent-menu-width="false" :options="Array.from({ length: 16 }, (_, i) => {
+      <n-select v-if="act.operation === '调节温度'" v-model:value="act.parameter" :consistent-menu-width="false" :options="Array.from({ length: 16 }, (_, i) => {
         const num = i + 16
         return { label: String(num), value: num }
       })" />
@@ -153,10 +164,10 @@ const actionGroupOptions = computed(() =>
     <template v-else-if="dtype === DeviceType.INDICATOR">
       <n-select v-model:value="act.operation" style="width: auto;"
         :options="['亮', '灭', '亮1秒'].map(x => ({ label: x, value: x }))" :consistent-menu-width="false" />
-      <n-input-number v-model:value="panelId" placeholder="" :show-button="false" style="width: 90px;">
+      <n-input-number v-model:value="panelId" :show-button="false" style="width: 90px;">
         <template #prefix><n-text depth="3">面板ID</n-text></template>
       </n-input-number>
-      <n-input-number v-model:value="keyId" placeholder="" :show-button="false" style="width: 90px;">
+      <n-input-number v-model:value="keyId" :show-button="false" style="width: 90px;">
         <template #prefix><n-text depth="3">按键ID</n-text></template>
       </n-input-number>
     </template>

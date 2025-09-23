@@ -66,7 +66,7 @@ watch(() => commonConfigs.value.useDayNight, (on) => {
       <n-form-item label="配置名称" path="configName">
         <n-input v-model:value="commonConfigs.configName" placeholder="输入" />
       </n-form-item>
-      <n-form-item label="夜间翻倍[是插拔卡输入]的红外输入时长">
+      <n-form-item label="夜间翻倍红外检测时长">
         <n-switch v-model:value="commonConfigs.useDayNight" />
       </n-form-item>
       <n-form-item label="白天时间点" path="dayTimePoint">
