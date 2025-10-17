@@ -151,7 +151,7 @@ function handleFile(file: File) {
 
     <n-layout>
       <n-layout-header bordered>
-        <h2 style="margin: 0 16px">Laminor2 - 1.1.1 -- 适配XZRCU - 1.1.x 版本</h2>
+        <h2 style="margin: 0 16px">Laminor2 - 1.1.2 -- 适配XZRCU - 1.1.x 版本</h2>
       </n-layout-header>
       <n-layout-content style="padding: 24px;">
         <RouterView />

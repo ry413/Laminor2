@@ -131,7 +131,8 @@ const currentActions = computed({
           { label: '是插拔卡输入', value: InputTag.IS_ALIVE_CHANNEL },
           { label: '是门磁输入', value: InputTag.IS_DOOR_CHANNEL },
           { label: '是门铃输入', value: InputTag.IS_DOORBELL_CHANNEL },
-          { label: '忽略任意键执行', value: InputTag.IGNORE_ANY_KEY_EXECUTE }
+          { label: '忽略任意键执行', value: InputTag.IGNORE_ANY_KEY_EXECUTE },
+          { label: '不会唤醒系统', value: InputTag.NOT_WAKEUP },
         ]" />
 
       <n-select v-if="model.type === InputType.PANEL_BTN" v-model:value="model.lightBindDid" placeholder="指示灯同步于"

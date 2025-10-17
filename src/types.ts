@@ -78,6 +78,7 @@ export const InputTag = {
   IS_DOOR_CHANNEL: "isDoorChannel",
   IS_DOORBELL_CHANNEL: "isDoorbellChannel",
   IGNORE_ANY_KEY_EXECUTE: "ignoreAnyKeyExecute",
+  NOT_WAKEUP: "noWakeup",
 } as const;
 export type InputTag = (typeof InputTag)[keyof typeof InputTag];
 export const InputTagList = [
@@ -86,6 +87,7 @@ export const InputTagList = [
   InputTag.IS_DOOR_CHANNEL,
   InputTag.IS_DOORBELL_CHANNEL,
   InputTag.IGNORE_ANY_KEY_EXECUTE,
+  InputTag.NOT_WAKEUP
 ];
 
 // 房间状态
