@@ -1,3 +1,10 @@
+## [1.2.0] - 2026-01-21
+### Added
+- 为 `DeviceType.ROOM_STATE` 添加了 `如果不存在此状态则跳出` 的操作
+
+### Changed
+- 将 `DeviceType.DELAYER` 的参数从秒改为毫秒
+
 ## [1.1.2] - 2025-10-17
 ### Added
 - 添加了 `InputTag::NOT_WAKEUP`, 用于让输入不唤醒睡眠

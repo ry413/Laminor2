@@ -136,14 +136,14 @@ const actionGroupOptions = computed(() =>
 
     <template v-else-if="dtype === DeviceType.ROOM_STATE">
       <n-select v-model:value="act.operation"
-        :options="['添加', '删除', '反转', '如果存在此状态则跳出'].map(x => ({ label: x, value: x }))" :consistent-menu-width="false" />
+        :options="['添加', '删除', '反转', '如果存在此状态则跳出', '如果不存在此状态则跳出'].map(x => ({ label: x, value: x }))" :consistent-menu-width="false" />
       <n-select v-model:value="act.parameter" :options="RoomStates.map(x => ({ label: x, value: x }))"
         :consistent-menu-width="false" />
     </template>
 
     <template v-else-if="dtype === DeviceType.DELAYER">
       <n-input-number v-model:value="parameterNum" style="width: 180px">
-        <template #suffix><n-text depth="3">秒</n-text></template>
+        <template #suffix><n-text depth="3">毫秒</n-text></template>
       </n-input-number>
     </template>
 

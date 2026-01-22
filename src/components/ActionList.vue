@@ -117,7 +117,7 @@ function resetPayloadForDevice(act: IActionRow) {
             break
         case DeviceType.DELAYER:
             act.operation = '延时'
-            act.parameter = 10
+            act.parameter = 10000
             break
         case DeviceType.ACTION_GROUP_OP:
             act.operation = '调用'
