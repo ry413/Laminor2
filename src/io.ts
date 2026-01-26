@@ -271,15 +271,54 @@ export function deserializeInputs(json: any[]): IInputRow[] {
   });
 }
 
-export function exportAll(
+// export function exportAll(
+//   commonConfigs: CommonConfigs,
+//   devs: IDeviceRow[],
+//   actionGroups: IActionGroupRow[],
+//   inputs: IInputRow[]
+// ) {
+//   return [
+//     JSON.stringify({ type: "Laminor2" }),
+//     JSON.stringify({ tm: new Date().toISOString().slice(0, 10) }),
+//     JSON.stringify({ c: commonConfigs }),
+//     JSON.stringify({ d: serializeDevices(devs) }),
+//     JSON.stringify({ a: serializeActionGroups(actionGroups) }),
+//     JSON.stringify({ i: serializeInputs(inputs) }),
+//   ].join("\n");
+// }
+async function generateHash(input: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+  // 转成64位hex
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+export async function exportAll(
   commonConfigs: CommonConfigs,
   devs: IDeviceRow[],
   actionGroups: IActionGroupRow[],
   inputs: IInputRow[]
 ) {
+  // 参与 hash 计算的内容(顺序固定)
+  const payload = [
+    { type: "Laminor2" },
+    { c: commonConfigs },
+    { d: serializeDevices(devs) },
+    { a: serializeActionGroups(actionGroups) },
+    { i: serializeInputs(inputs) },
+  ];
+
+  // 作为 hash 输入的唯一字符串
+  const hashSource = payload.map(v => JSON.stringify(v)).join("\n");
+
+  const hash = (await generateHash(hashSource)).slice(0, 16); // 取前16位作为简短hash
+
   return [
     JSON.stringify({ type: "Laminor2" }),
-    JSON.stringify({ tm: new Date().toISOString().slice(0, 10) }),
+    JSON.stringify({ hash }),
     JSON.stringify({ c: commonConfigs }),
     JSON.stringify({ d: serializeDevices(devs) }),
     JSON.stringify({ a: serializeActionGroups(actionGroups) }),

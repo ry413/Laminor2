@@ -23,8 +23,8 @@ const { trueDeviceRows, allTargets } = useDevices()
 
 const targetSerialNum = ref("")
 
-function downloadConfig() {
-  const text = exportAll(commonConfigs.value, allTargets.value, actionGroupRows.value, inputRows.value)
+async function downloadConfig() {
+  const text = await exportAll(commonConfigs.value, allTargets.value, actionGroupRows.value, inputRows.value)
   const blob = new Blob([text], { type: 'application/x-ndjson' })
 
   const a = document.createElement('a')
@@ -34,9 +34,9 @@ function downloadConfig() {
   URL.revokeObjectURL(a.href)
 }
 
-function sendConfig() {
+async function sendConfig() {
   console.log('Sending to:', targetSerialNum.value);
-  const text = exportAll(commonConfigs.value, allTargets.value, actionGroupRows.value, inputRows.value);
+  const text = await exportAll(commonConfigs.value, allTargets.value, actionGroupRows.value, inputRows.value);
 
   client = mqtt.connect(brokerUrl, {
     username, password
@@ -151,7 +151,7 @@ function handleFile(file: File) {
 
     <n-layout>
       <n-layout-header bordered>
-        <h2 style="margin: 0 16px">Laminor2 - 1.2.0 -- 适配XZRCU - 1.1.8 </h2>
+        <h2 style="margin: 0 16px">Laminor2 - 1.2.1 -- 适配XZRCU - 1.1.9</h2>
       </n-layout-header>
       <n-layout-content style="padding: 24px;">
         <RouterView />
